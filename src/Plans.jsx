@@ -282,7 +282,7 @@ function openRazorpayPopup({ subscriptionId, user, course, onClose }) {
   const frontendUrl =
     import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";
   const rzp = new window.Razorpay({
-    key: "rzp_test_TPvmLfTzotPd5l",
+    key: import.meta.env.VITE_RAZORPAY_KEY_ID,
     description: "Storage Plan Subscription",
     name: "Storage App",
     subscription_id: subscriptionId,
