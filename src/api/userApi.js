@@ -42,6 +42,9 @@ export const deleteUserById = async (id) => {
 };
 
 export const setUserPassword = async (email, password) => {
-  const { data } = await axiosWithCreds.post("/user/set-password", { email, password });
+  const { data } = await axiosWithCreds.post("/user/set-password", {
+    email,
+    password,
+  });
   return data;
-}
+};

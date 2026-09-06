@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
@@ -36,7 +34,7 @@ export const handleGithubLogin = () => {
   const popup = window.open(
     getGithubLoginUrl(),
     "github-login",
-    `width=${POPUP_CONFIG.width},height=${POPUP_CONFIG.height},left=${getPopupPosition().left},top=${getPopupPosition().top},resizable=${POPUP_CONFIG.resizable},scrollbars=${POPUP_CONFIG.scrollbars}`
+    `width=${POPUP_CONFIG.width},height=${POPUP_CONFIG.height},left=${getPopupPosition().left},top=${getPopupPosition().top},resizable=${POPUP_CONFIG.resizable},scrollbars=${POPUP_CONFIG.scrollbars}`,
   );
 
   if (!popup) {
@@ -45,9 +43,21 @@ export const handleGithubLogin = () => {
 };
 
 // Sub-components
-const FormField = ({ id, name, type, label, placeholder, value, onChange, error }) => (
+const FormField = ({
+  id,
+  name,
+  type,
+  label,
+  placeholder,
+  value,
+  onChange,
+  error,
+}) => (
   <div className="relative mb-4">
-    <label htmlFor={id} className="block mb-1.5 text-sm font-medium text-gray-700 dark:text-white">
+    <label
+      htmlFor={id}
+      className="block mb-1.5 text-sm font-medium text-gray-700 dark:text-white"
+    >
       {label}
     </label>
     <input
@@ -78,11 +88,19 @@ const FormField = ({ id, name, type, label, placeholder, value, onChange, error 
 const Divider = ({ text }) => (
   <div className="relative text-center my-5">
     <div className="absolute inset-x-0 top-1/2 transform -translate-y-1/2 h-px bg-gray-300 dark:bg-slate-700"></div>
-    <span className="relative bg-white dark:bg-slate-800 px-4 text-sm text-gray-500 dark:text-slate-400">{text}</span>
+    <span className="relative bg-white dark:bg-slate-800 px-4 text-sm text-gray-500 dark:text-slate-400">
+      {text}
+    </span>
   </div>
 );
 
-export const SocialLoginButton = ({ icon: Icon, text, onClick, bgColor, hoverColor }) => (
+export const SocialLoginButton = ({
+  icon: Icon,
+  text,
+  onClick,
+  bgColor,
+  hoverColor,
+}) => (
   <button
     type="button"
     onClick={onClick}
@@ -140,14 +158,21 @@ const Login = () => {
 
     try {
       const data = await loginUser(formData);
+
       if (data.error) {
         setServerError(data.error);
       } else {
         navigate("/");
       }
     } catch (err) {
-      console.error("Login error:", err);
-      setServerError(err.response?.data?.error || "Something went wrong. Please try again.");
+      if (err.response && err.response.status === 429) {
+        setServerError("Too many login attempts. Please try again later.");
+      } else {
+        setServerError(
+          err.response?.data?.error ||
+            "Something went wrong. Please try again.",
+        );
+      }
     } finally {
       setIsLoading(false);
     }
@@ -174,7 +199,9 @@ const Login = () => {
       <div className="max-w-md w-full bg-white dark:bg-slate-800 border dark:border-white rounded-xl shadow-lg p-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome Back</h2>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Welcome Back
+          </h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">
             Sign in to continue to your account
           </p>
@@ -230,8 +257,8 @@ const Login = () => {
         {/* Register Link */}
         <p className="text-center mt-4 text-sm text-gray-600 dark:text-slate-400">
           Don't have an account?{" "}
-          <Link 
-            to="/register" 
+          <Link
+            to="/register"
             className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition duration-200"
           >
             Create one now
@@ -242,17 +269,16 @@ const Login = () => {
 
         {/* Social Login */}
         <div className="space-y-3">
-          
-            <GoogleLogin
-              onSuccess={handleGoogleLoginSuccess}
-              onError={() => setServerError("Google login failed. Please try again.")}
-              theme="filled_blue"
-              text="continue_with"
-              shape="rectangular"
-              
-              useOneTap
-            />
-          
+          <GoogleLogin
+            onSuccess={handleGoogleLoginSuccess}
+            onError={() =>
+              setServerError("Google login failed. Please try again.")
+            }
+            theme="filled_blue"
+            text="continue_with"
+            shape="rectangular"
+            useOneTap
+          />
 
           <SocialLoginButton
             icon={FaGithub}

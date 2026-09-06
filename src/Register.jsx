@@ -17,9 +17,22 @@ const OTP_COUNTDOWN_SECONDS = 60;
 
 // ─── Sub-components ──────────────────────────────────────────
 
-const FormField = ({ id, name, type, label, placeholder, value, onChange, error, rightElement }) => (
+const FormField = ({
+  id,
+  name,
+  type,
+  label,
+  placeholder,
+  value,
+  onChange,
+  error,
+  rightElement,
+}) => (
   <div className="space-y-1.5">
-    <label htmlFor={id} className="block text-sm font-medium text-gray-700 dark:text-slate-300">
+    <label
+      htmlFor={id}
+      className="block text-sm font-medium text-gray-700 dark:text-slate-300"
+    >
       {label}
     </label>
     <div className="relative">
@@ -55,15 +68,26 @@ const FormField = ({ id, name, type, label, placeholder, value, onChange, error,
   </div>
 );
 
-const OTPInput = ({ value, onChange, onVerify, isVerifying, isVerified, error }) => (
+const OTPInput = ({
+  value,
+  onChange,
+  onVerify,
+  isVerifying,
+  isVerified,
+  error,
+}) => (
   <div className="space-y-1.5">
-    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Verification Code</label>
+    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
+      Verification Code
+    </label>
     <div className="relative">
       <input
         type="text"
         maxLength={OTP_LENGTH}
         value={value}
-        onChange={(e) => onChange(e.target.value.replace(/\D/g, "").slice(0, OTP_LENGTH))}
+        onChange={(e) =>
+          onChange(e.target.value.replace(/\D/g, "").slice(0, OTP_LENGTH))
+        }
         placeholder="Enter 4-digit code"
         disabled={isVerified}
         className={`
@@ -85,18 +109,23 @@ const OTPInput = ({ value, onChange, onVerify, isVerifying, isVerified, error })
           absolute right-2 top-1/2 -translate-y-1/2 
           px-3 py-1.5 text-xs font-medium rounded-lg
           transition-all duration-200
-          ${isVerified 
-            ? "bg-green-500 text-white cursor-default" 
-            : "bg-blue-500 hover:bg-blue-600 text-white hover:shadow-md"
+          ${
+            isVerified
+              ? "bg-green-500 text-white cursor-default"
+              : "bg-blue-500 hover:bg-blue-600 text-white hover:shadow-md"
           }
           ${(isVerifying || value.length < OTP_LENGTH) && !isVerified ? "opacity-50 cursor-not-allowed" : ""}
           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1
         `}
       >
         {isVerifying ? (
-          <><i className="fas fa-spinner fa-spin mr-1" /> Verifying</>
+          <>
+            <i className="fas fa-spinner fa-spin mr-1" /> Verifying
+          </>
         ) : isVerified ? (
-          <><i className="fas fa-check-circle mr-1" /> Verified</>
+          <>
+            <i className="fas fa-check-circle mr-1" /> Verified
+          </>
         ) : (
           "Verify"
         )}
@@ -114,7 +143,9 @@ const OTPInput = ({ value, onChange, onVerify, isVerifying, isVerified, error })
 const Divider = ({ text }) => (
   <div className="relative text-center my-6">
     <div className="divider-line absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-gray-200 dark:bg-slate-700" />
-    <span className="relative bg-white dark:bg-slate-800 px-4 text-sm text-gray-400 dark:text-slate-500 font-light">{text}</span>
+    <span className="relative bg-white dark:bg-slate-800 px-4 text-sm text-gray-400 dark:text-slate-500 font-light">
+      {text}
+    </span>
   </div>
 );
 
@@ -182,13 +213,19 @@ const Register = () => {
 
   const handleSendOtp = async () => {
     if (!formData.email) {
-      setFieldErrors((prev) => ({ ...prev, email: "Please enter your email first." }));
+      setFieldErrors((prev) => ({
+        ...prev,
+        email: "Please enter your email first.",
+      }));
       return;
     }
 
     // Simple email validation
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      setFieldErrors((prev) => ({ ...prev, email: "Please enter a valid email address." }));
+      setFieldErrors((prev) => ({
+        ...prev,
+        email: "Please enter a valid email address.",
+      }));
       return;
     }
 
@@ -199,7 +236,13 @@ const Register = () => {
       setOtpSent(true);
       setCountdown(OTP_COUNTDOWN_SECONDS);
     } catch (err) {
-      setOtpError(err.response?.data?.error || "Failed to send OTP. Please try again.");
+      if (err.response?.status === 429) {
+        setOtpError("Too many requests. Please wait before trying again.");
+      } else {
+        setOtpError(
+          err.response?.data?.error || "Failed to send OTP. Please try again.",
+        );
+      }
     } finally {
       setIsSending(false);
     }
@@ -217,7 +260,10 @@ const Register = () => {
       await verifyOtp(formData.email, otp);
       setOtpVerified(true);
     } catch (err) {
-      setOtpError(err.response?.data?.error || "Invalid or expired OTP. Please try again.");
+      setOtpError(
+        err.response?.data?.error ||
+          "Invalid or expired OTP. Please try again.",
+      );
     } finally {
       setIsVerifying(false);
     }
@@ -230,9 +276,11 @@ const Register = () => {
     const errors = {};
     if (!formData.name.trim()) errors.name = "Name is required.";
     if (!formData.email.trim()) errors.email = "Email is required.";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = "Valid email is required.";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      errors.email = "Valid email is required.";
     if (!formData.password.trim()) errors.password = "Password is required.";
-    else if (formData.password.length < 4) errors.password = "Password must be at least 4 characters.";
+    else if (formData.password.length < 4)
+      errors.password = "Password must be at least 4 characters.";
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
@@ -251,7 +299,9 @@ const Register = () => {
       setIsSuccess(true);
       setTimeout(() => navigate("/"), 2000);
     } catch (err) {
-      setServerError(err.response?.data?.error || "Something went wrong. Please try again.");
+      setServerError(
+        err.response?.data?.error || "Something went wrong. Please try again.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -272,11 +322,14 @@ const Register = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8 ">
       <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 md:p-9 border border-black dark:border-white register-card">
-
         {/* Header */}
         <div className="text-center mb-7">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Create Account</h2>
-          <p className="mt-1.5 text-sm text-gray-500 dark:text-slate-400">Join us and get started</p>
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+            Create Account
+          </h2>
+          <p className="mt-1.5 text-sm text-gray-500 dark:text-slate-400">
+            Join us and get started
+          </p>
         </div>
 
         {/* Form */}
@@ -293,7 +346,9 @@ const Register = () => {
           />
 
           <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Email Address</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
+              Email Address
+            </label>
             <div className="relative">
               <input
                 id="email"
@@ -320,18 +375,23 @@ const Register = () => {
                   absolute right-2 top-1/2 -translate-y-1/2 
                   px-3 py-1.5 text-xs font-medium rounded-lg
                   transition-all duration-200
-                  ${otpVerified 
-                    ? "bg-green-500 text-white cursor-default" 
-                    : "bg-blue-500 hover:bg-blue-600 text-white hover:shadow-md"
+                  ${
+                    otpVerified
+                      ? "bg-green-500 text-white cursor-default"
+                      : "bg-blue-500 hover:bg-blue-600 text-white hover:shadow-md"
                   }
                   ${(isSending || countdown > 0) && !otpVerified ? "opacity-50 cursor-not-allowed" : ""}
                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1
                 `}
               >
                 {otpVerified ? (
-                  <><i className="fas fa-check-circle mr-1" /> Verified</>
+                  <>
+                    <i className="fas fa-check-circle mr-1" /> Verified
+                  </>
                 ) : isSending ? (
-                  <><i className="fas fa-spinner fa-spin mr-1" /> Sending</>
+                  <>
+                    <i className="fas fa-spinner fa-spin mr-1" /> Sending
+                  </>
                 ) : countdown > 0 ? (
                   `${countdown}s`
                 ) : (
@@ -402,13 +462,19 @@ const Register = () => {
               hover:shadow-md
               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
               active:scale-[0.98]
-              ${(!otpVerified || isSubmitting || isSuccess) ? "opacity-60 cursor-not-allowed" : ""}
+              ${!otpVerified || isSubmitting || isSuccess ? "opacity-60 cursor-not-allowed" : ""}
             `}
           >
             {isSubmitting ? (
-              <><i className="fas fa-spinner fa-spin mr-2" /> Creating account...</>
+              <>
+                <i className="fas fa-spinner fa-spin mr-2" /> Creating
+                account...
+              </>
             ) : isSuccess ? (
-              <><i className="fas fa-check-circle mr-2" /> Registration Successful!</>
+              <>
+                <i className="fas fa-check-circle mr-2" /> Registration
+                Successful!
+              </>
             ) : (
               "Create Account"
             )}
@@ -418,7 +484,10 @@ const Register = () => {
         {/* Login Link */}
         <p className="text-center mt-5 text-sm text-gray-600 dark:text-slate-400">
           Already have an account?{" "}
-          <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition duration-200">
+          <Link
+            to="/login"
+            className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition duration-200"
+          >
             Sign in
           </Link>
         </p>
@@ -430,7 +499,9 @@ const Register = () => {
           <div className="google-btn-wrapper w-full rounded-xl overflow-hidden shadow-sm hover:shadow transition-all duration-200">
             <GoogleLogin
               onSuccess={handleGoogleLoginSuccess}
-              onError={() => setServerError("Google login failed. Please try again.")}
+              onError={() =>
+                setServerError("Google login failed. Please try again.")
+              }
               theme="filled_blue"
               text="continue_with"
               shape="rectangular"
@@ -450,9 +521,19 @@ const Register = () => {
         {/* Footer */}
         <p className="text-center mt-7 text-xs text-gray-400/80 dark:text-slate-500 tracking-wide">
           By creating an account, you agree to our{" "}
-          <a href="#" className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 underline-offset-2 hover:underline">Terms</a>{" "}
+          <a
+            href="#"
+            className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 underline-offset-2 hover:underline"
+          >
+            Terms
+          </a>{" "}
           and{" "}
-          <a href="#" className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 underline-offset-2 hover:underline">Privacy Policy</a>
+          <a
+            href="#"
+            className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 underline-offset-2 hover:underline"
+          >
+            Privacy Policy
+          </a>
         </p>
       </div>
     </div>
